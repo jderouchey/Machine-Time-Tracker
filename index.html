@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Maintenance Time Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .machine-selection {
+            flex: 1;
+            min-width: 300px;
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .timer-section {
+            flex: 2;
+            min-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .machine-btn {
+            padding: 12px 8px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        
+        .machine-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .machine-btn.selected {
+            background-color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .timer-display {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .start-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .stop-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .stop-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .objective-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .objective-checkbox {
+            margin-right: 10px;
+            transform: scale(1.5);
+        }
+        
+        .report-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .generate-report {
+            background-color: #9b59b6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .generate-report:hover {
+            background-color: #8e44ad;
+        }
+        
+        .report-output {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .current-session {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .shift-info {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Machine Maintenance Time Tracker</h1>
+            <p>Track your machine maintenance tasks and generate shift reports</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="machine-selection">
+                <h2>Select Machine</h2>
+                <p>Click on a machine to select it:</p>
+                
+                <div class="machine-grid">
+                    <button class="machine-btn" data-machine="AFSM100">AFSM100</button>
+                    <button class="machine-btn" data-machine="AFSM100-ai">AFSM100-ai</button>
+                    <button class="machine-btn" data-machine="AFSM100-CIOSS-003">AFSM100-CIOSS-003</button>
+                    <button class="machine-btn" data-machine="DBCS-005">DBCS-005</button>
+                    <button class="machine-btn" data-machine="DBCS-008">DBCS-008</button>
+                    <button class="machine-btn" data-machine="DBCS-009">DBCS-009</button>
+                    <button class="machine-btn" data-machine="DBOSS-006">DBOSS-006</button>
+                    <button class="machine-btn" data-machine="DBOSS-007">DBOSS-007</button>
+                    <button class="machine-btn" data-machine="DIOSS-010">DIOSS-010</button>
+                    <button class="machine-btn" data-machine="DIOSS-012">DIOSS-012</button>
+                    <button class="machine-btn" data-machine="LCTS">LCTS</button>
+                    <button class="machine-btn" data-machine="SDUS">SDUS</button>
+                    <button class="machine-btn" data-machine="ADUS">ADUS</button>
+                    <button class="machine-btn" data-machine="LCREM">LCREM</button>
+                    <button class="machine-btn" data-machine="AAA">AAA</button>
+                    <button class="machine-btn" data-machine="APBS">APBS</button>
+                    <button class="machine-btn" data-machine="SASWYBSASWYB">SASWYBSASWYB</button>
+                    <button class="machine-btn" data-machine="DPRC">DPRC</button>
+                    <button class="machine-btn" data-machine="LMS">LMS</button>
+                    <button class="machine-btn" data-machine="ATU">ATU</button>
+                    <button class="machine-btn" data-machine="Network">Network</button>
+                    <button class="machine-btn" data-machine="Misc">Misc</button>
+                </div>
+                
+                <div class="shift-info">
+                    <div>
+                        <strong>Shift Start:</strong>
+                        <span id="shift-start-time">Not started</span>
+                    </div>
+                    <div>
+                        <strong>Current Session:</strong>
+                        <span id="sessions-count">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timer-section">
+                <h2>Time Tracking</h2>
+                
+                <div class="current-session">
+                    <p><strong>Selected Machine:</strong> <span id="selected-machine">None</span></p>
+                    <p><strong>Session Start:</strong> <span id="session-start-time">Not started</span></p>
+                </div>
+                
+                <div class="timer-display" id="timer">
+                    00:00:00
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn start-btn" id="start-btn">Start Timer</button>
+                    <button class="btn stop-btn" id="stop-btn" disabled>Stop Timer</button>
+                </div>
+                
+                <div class="objective-section">
+                    <label>
+                        <input type="checkbox" id="objective-checkbox" class="objective-checkbox">
+                        Objective Achieved
+                    </label>
+                    <p><small>Check this box if you successfully resolved the issue</small></p>
+                </div>
+                
+                <div class="report-section">
+                    <button class="generate-report" id="generate-report">Generate Shift Report</button>
+                    
+                    <div class="report-output" id="report-output">
+                        Report will appear here after you generate it.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const machineButtons = document.querySelectorAll('.machine-btn');
+            const selectedMachineElement = document.getElementById('selected-machine');
+            const startButton = document.getElementById('start-btn');
+            const stopButton = document.getElementById('stop-btn');
+            const timerElement = document.getElementById('timer');
+            const sessionStartTimeElement = document.getElementById('session-start-time');
+            const shiftStartTimeElement = document.getElementById('shift-start-time');
+            const sessionsCountElement = document.getElementById('sessions-count');
+            const objectiveCheckbox = document.getElementById('objective-checkbox');
+            const generateReportButton = document.getElementById('generate-report');
+            const reportOutputElement = document.getElementById('report-output');
+            
+            // State variables
+            let selectedMachine = null;
+            let startTime = null;
+            let timerInterval = null;
+            let elapsedTime = 0;
+            let sessions = [];
+            let shiftStartTime = null;
+            
+            // Initialize machine selection
+            machineButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    machineButtons.forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedMachine = this.getAttribute('data-machine');
+                    selectedMachineElement.textContent = selectedMachine;
+                });
+            });
+            
+            // Start timer
+            startButton.addEventListener('click', function() {
+                if (!selectedMachine) {
+                    alert('Please select a machine first');
+                    return;
+                }
+                
+                // Record start time
+                startTime = new Date();
+                if (!shiftStartTime) {
+                    shiftStartTime = startTime;
+                    shiftStartTimeElement.textContent = formatTime(shiftStartTime);
+                }
+                
+                // Update UI
+                sessionStartTimeElement.textContent = formatTime(startTime);
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 1000);
+            });
+            
+            // Stop timer
+            stopButton.addEventListener('click', function() {
+                if (!startTime) return;
+                
+                // Record end time
+                const endTime = new Date();
+                const duration = Math.floor((endTime - startTime) / 1000);
+                const objectiveAchieved = objectiveCheckbox.checked;
+                
+                // Save session
+                sessions.push({
+                    machine: selectedMachine,
+                    startTime: startTime,
+                    endTime: endTime,
+                    duration: duration,
+                    objectiveAchieved: objectiveAchieved
+                });
+                
+                // Update UI
+                sessionsCountElement.textContent = sessions.length;
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                objectiveCheckbox.checked = false;
+                
+                // Stop timer
+                clearInterval(timerInterval);
+                timerElement.textContent = '00:00:00';
+                elapsedTime = 0;
+            });
+            
+            // Generate report
+            generateReportButton.addEventListener('click', function() {
+                if (sessions.length === 0) {
+                    reportOutputElement.textContent = 'No sessions recorded yet.';
+                    return;
+                }
+                
+                // Calculate statistics
+                const machineStats = {};
+                let totalTime = 0;
+                let totalObjectiveAchieved = 0;
+                
+                sessions.forEach(session => {
+                    // Machine-specific stats
+                    if (!machineStats[session.machine]) {
+                        machineStats[session.machine] = {
+                            totalTime: 0,
+                            sessions: 0,
+                            objectives: 0
+                        };
+                    }
+                    
+                    machineStats[session.machine].totalTime += session.duration;
+                    machineStats[session.machine].sessions += 1;
+                    if (session.objectiveAchieved) {
+                        machineStats[session.machine].objectives += 1;
+                        totalObjectiveAchieved++;
+                    }
+                    
+                    totalTime += session.duration;
+                });
+                
+                // Calculate idle time (time between sessions)
+                let idleTime = 0;
+                for (let i = 1; i < sessions.length; i++) {
+                    const previousEnd = sessions[i-1].endTime.getTime();
+                    const currentStart = sessions[i].startTime.getTime();
+                    idleTime += (currentStart - previousEnd) / 1000;
+                }
+                
+                const averageIdleTime = idleTime / (sessions.length - 1) || 0;
+                
+                // Generate report text
+                let reportText = `SHIFT REPORT\n`;
+                reportText += `Generated: ${formatTime(new Date())}\n`;
+                reportText += `Shift Start: ${formatTime(shiftStartTime)}\n`;
+                reportText += `Total Sessions: ${sessions.length}\n`;
+                reportText += `Total Time: ${formatDuration(totalTime)}\n`;
+                reportText += `Objectives Achieved: ${totalObjectiveAchieved}/${sessions.length}\n`;
+                reportText += `Average Idle Time: ${formatDuration(averageIdleTime)}\n\n`;
+                
+                reportText += `MACHINE BREAKDOWN:\n`;
+                reportText += `----------------\n`;
+                
+                for (const machine in machineStats) {
+                    const stats = machineStats[machine];
+                    const avgTime = stats.totalTime / stats.sessions;
+                    
+                    reportText += `${machine}:\n`;
+                    reportText += `  Sessions: ${stats.sessions}\n`;
+                    reportText += `  Total Time: ${formatDuration(stats.totalTime)}\n`;
+                    reportText += `  Average Time: ${formatDuration(avgTime)}\n`;
+                    reportText += `  Objectives: ${stats.objectives}/${stats.sessions}\n\n`;
+                }
+                
+                reportText += `SESSION DETAILS:\n`;
+                reportText += `----------------\n`;
+                
+                sessions.forEach((session, index) => {
+                    reportText += `${index + 1}. ${session.machine}\n`;
+                    reportText += `   Start: ${formatTime(session.startTime)}\n`;
+                    reportText += `   End: ${formatTime(session.endTime)}\n`;
+                    reportText += `   Duration: ${formatDuration(session.duration)}\n`;
+                    reportText += `   Objective: ${session.objectiveAchieved ? 'Achieved' : 'Not Achieved'}\n\n`;
+                });
+                
+                reportOutputElement.textContent = reportText;
+            });
+            
+            // Helper functions
+            function updateTimer() {
+                elapsedTime++;
+                timerElement.textContent = formatDuration(elapsedTime);
+            }
+            
+            function formatDuration(seconds) {
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                return [
+                    hrs.toString().padStart(2, '0'),
+                    mins.toString().padStart(2, '0'),
+                    secs.toString().padStart(2, '0')
+                ].join(':');
+            }
+            
+            function formatTime(date) {
+                if (!date) return 'N/A';
+                
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

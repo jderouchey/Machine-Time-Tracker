@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Maintenance Time Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #333;
+            line-height: 1.6;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .header-icons {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-icons i {
+            font-size: 1.4rem;
+            opacity: 0.8;
+        }
+        
+        .auth-container {
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .auth-form input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .auth-form button {
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: #e0e0e0;
+            cursor: pointer;
+        }
+        
+        .auth-tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .user-info {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: white;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+            gap: 20px;
+        }
+        
+        .machine-selection {
+            width: 100%;
+            background: linear-gradient(to bottom, #ecf0f1, #dde4e6);
+            padding: 20px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .timer-section {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .machine-btn {
+            padding: 12px 8px;
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 13px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            touch-action: manipulation;
+        }
+        
+        .machine-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .machine-btn.selected {
+            background: linear-gradient(to bottom, #2c3e50, #1a2530);
+            font-weight: bold;
+            transform: translateY(-1px);
+        }
+        
+        .timer-display {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 16px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            touch-action: manipulation;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background: linear-gradient(to bottom, #27ae60, #219653);
+        }
+        
+        .stop-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .stop-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #a23526);
+        }
+        
+        .report-section {
+            margin-top: 25px;
+            padding: 20px 15px;
+            background: linear-gradient(to bottom, #f9f9f9, #f0f0f0);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .generate-report {
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            touch-action: manipulation;
+        }
+        
+        .generate-report:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(to bottom, #8e44ad, #7d3c98);
+        }
+        
+        .report-output {
+            background: linear-gradient(to bottom, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .current-session {
+            background: linear-gradient(to bottom, #fff8e1, #fff4d3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        .shift-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: linear-gradient(to bottom, #e8f5e9, #d5ecd7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4caf50;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(to bottom right, #ffffff, #f5f5f5);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-top: 4px solid #3498db;
+        }
+        
+        .stat-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .session-list {
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .session-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .session-item.completed {
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .session-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .session-action-btn {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .session-action-btn.edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .session-action-btn.delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .modal-form-group input,
+        .modal-form-group textarea,
+        .modal-form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .modal-form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            display: inline-flex;
+            align-items: cemter;
+        }
+        
+        .modal-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .modal-btn.cancel {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .modal-btn.confirm {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Mobile-specific optimizations */
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+            }
+            
+            .machine-selection {
+                flex: 1;
+                min-width: 300px;
+            }
+            
+            .timer-section {
+                flex: 2;
+                min-width: 400px;
+            }
+            
+            .control-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .shift-info {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .machine-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timer-display {
+                font-size: 2rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 0.9rem;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Improved touch targets */
+        @media (max-width: 768px) {
+            .machine-btn {
+                padding: 14px 8px;
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .btn {
+                min-height: 55px;
+            }
+            
+            .generate-report {
+                min-height: 55px;
+            }
+        }
+        
+        /* Prevent zoom on input focus for iOS */
+        @media (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info hidden" id="user-info">
+                <span id="username-display"></span>
+                <button class="logout-btn" id="logout-btn">Logout</button>
+            </div>
+            <h1>Machine Maintenance Time Tracker</h1>
+            <p>Track your machine maintenance tasks</p>
+            <div class="header-icons">
+                <i class="fas fa-tools"></i>
+                <i class="fas fa-clock"></i>
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+        </header>
+        
+        <div id="auth-container" class="auth-container">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="login-tab">Login</div>
+                <div class="auth-tab" id="register-tab">Register</div>
+            </div>
+            
+            <div class="auth-form" id="login-form">
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button id="login-btn">Login</button>
+            </div>
+            
+            <div class="auth-form hidden" id="register-form">
+                <input type="text" id="register-username" placeholder="Username" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <input type="password" id="register-confirm-password" placeholder="Confirm Password" required>
+                <input type="text" id="register-fullname" placeholder="Full Name" required>
+                <button id="register-btn">Register</button>
+            </div>
+        </div>
+        
+        <div id="main-content" class="main-content hidden">
+            <div class="machine-selection">
+                <h2><i class="fas fa-cogs"></i> Select Machine</h2>
+                <p>Click on a machine to select it:</p>
+                
+                <div class="machine-grid">
+                    <button class="machine-btn" data-machine="AFCS-200-1">AFCS-200-1</button>
+                    <button class="machine-btn" data-machine="AFSM100">AFSM100</button>
+                    <button class="machine-btn" data-machine="AFSM100-ai">AFSM100-ai</button>
+                    <button class="machine-btn" data-machine="AFSM-100-aths">AFSM-100-aths</button>
+                    <button class="machine-btn" data-machine="CIOSS-003">CIOSS-003</button>
+                    <button class="machine-btn" data-machine="DBCS-005">DBCS-005</button>
+                    <button class="machine-btn" data-machine="DBCS-008">DBCS-008</button>
+                    <button class="machine-btn" data-machine="DBCS-009">DBCS-009</button>
+                    <button class="machine-btn" data-machine="DBOSS-006">DBOSS-006</button>
+                    <button class="machine-btn" data-machine="DBOSS-007">DBOSS-007</button>
+                    <button class="machine-btn" data-machine="DIOSS-010">DIOSS-010</button>
+                    <button class="machine-btn" data-machine="DIOSS-012">DIOSS-012</button>
+                    <button class="machine-btn" data-machine="LCTS">LCTS</button>
+                    <button class="machine-btn" data-machine="SDUS">SDUS</button>
+                    <button class="machine-btn" data-machine="ADUS">ADUS</button>
+                    <button class="machine-btn" data-machine="LCREM">LCREM</button>
+                    <button class="machine-btn" data-machine="AAA">AAA</button>
+                    <button class="machine-btn" data-machine="APBS">APBS</button>
+                    <button class="machine-btn" data-machine="SWYB">SWYB</button>
+                    <button class="machine-btn" data-machine="DPRC">DPRC</button>
+                    <button class="machine-btn" data-machine="LMS">LMS</button>
+                    <button class="machine-btn" data-machine="ATU">ATU</button>
+                    <button class="machine-btn" data-machine="Network">Network</button>
+                    <button class="machine-btn" data-machine="Battery">Battery</button>
+                    <button class="machine-btn" data-machine="Misc">Misc</button>
+                </div>
+                
+                <div class="shift-info">
+                    <div>
+                        <strong>Shift Start:</strong>
+                        <span id="shift-start-time">Not started</span>
+                    </div>
+                    <div>
+                        <strong>Sessions:</strong>
+                        <span id="sessions-count">0</span>
+                    </div>
+                </div>
+                
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <h3>Machines Serviced</h3>
+                        <div class="stat-value" id="total-machines">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Objectives</h3>
+                        <div class="stat-value" id="objectives-achieved">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg. Time</h3>
+                        <div class="stat-value" id="avg-time">00:00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timer-section">
+                <h2><i class="fas fa-stopwatch"></i> Time Tracking</h2>
+                
+                <div class="current-session">
+                    <p><strong>Selected Machine:</strong> <span id="selected-machine">None</span></p>
+                    <p><strong>Session Start:</strong> <span id="session-start-time">Not started</span></p>
+                </div>
+                
+                <div class="timer-display" id="timer">
+                    00:00:00
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn start-btn" id="start-btn"><i class="fas fa-play"></i> Start Timer</button>
+                    <button class="btn stop-btn" id="stop-btn" disabled><i class="fas fa-stop"></i> Stop Timer</button>
+                </div>
+                
+                <div class="session-list" id="session-list">
+                    <h3>Recent Sessions</h3>
+                    <div id="sessions-container">
+                        <p class="no-sessions">No sessions recorded yet. Start a timer to begin tracking.</p>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <button class="generate-report" id="generate-report"><i class="fas fa-file-alt"></i> Generate Shift Report</button>
+                    
+                    <div class="report-output" id="report-output">
+                        Report will appear here after you generate it.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stop Confirmation Modal -->
+    <div class="modal" id="stop-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Complete Service Call</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-form-group">
+                <label for="stop-notes">Service Call Notes:</label>
+                <textarea id="stop-notes" placeholder="Enter details about the service call, issues found, solutions applied, parts replaced, etc."></textarea>
+            </div>
+            <div class="modal-form-group">
+                <label>
+                    <input type="checkbox" id="stop-objective">
+                    Objective Achieved
+                </label>
+            </div>
+            <div class="modal-form-actions">
+                <button class="modal-btn cancel" id="stop-cancel">Cancel</button>
+                <button class="modal-btn confirm" id="stop-confirm">Save Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Session Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Session</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-form-group">
+                <label for="edit-machine">Machine:</label>
+                <select id="edit-machine">
+                    <option value="AFCS-200-1">AFCS-200-1</option>
+                    <option value="AFSM100">AFSM100</option>
+                    <option value="AFSM100-ai">AFSM100-ai</option>
+                    <option value="AFSM-100-aths">AFSM-100-aths</option>
+                    <option value="CIOSS-003">CIOSS-003</option>
+                    <option value="DBCS-005">DBCS-005</option>
+                    <option value="DBCS-008">DBCS-008</option>
+                    <option value="DBCS-009">DBCS-009</option>
+                    <option value="DBOSS-006">DBOSS-006</option>
+                    <option value="DBOSS-007">DBOSS-007</option>
+                    <option value="DIOSS-010">DIOSS-010</option>
+                    <option value="DIOSS-012">DIOSS-012</option>
+                    <option value="LCTS">LCTS</option>
+                    <option value="SDUS">SDUS</option>
+                    <option value="ADUS">ADUS</option>
+                    <option value="LCREM">LCREM</option>
+                    <option value="AAA">AAA</option>
+                    <option value="APBS">APBS</option>
+                    <option value="SWYB">SWYB</option>
+                    <option value="DPRC">DPRC</option>
+                    <option value="LMS">LMS</option>
+                    <option value="ATU">ATU</option>
+                    <option value="Network">Network</option>
+                    <option value="Battery">Battery</option>
+                    <option value="Misc">Misc</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label for="edit-start">Start Time:</label>
+                <input type="datetime-local" id="edit-start">
+            </div>
+            <div class="modal-form-group">
+                <label for="edit-end">End Time:</label>
+                <input type="datetime-local" id="edit-end">
+            </div>
+            <div class="modal-form-group">
+                <label for="edit-notes">Notes:</label>
+                <textarea id="edit-notes" placeholder="Enter details about the service call"></textarea>
+            </div>
+            <div class="modal-form-group">
+                <label>
+                    <input type="checkbox" id="edit-objective">
+                    Objective Achieved
+                </label>
+            </div>
+            <div class="modal-form-actions">
+                <button class="modal-btn cancel" id="edit-cancel">Cancel</button>
+                <button class="modal-btn confirm" id="edit-confirm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const authContainer = document.getElementById('auth-container');
+            const mainContent = document.getElementById('main-content');
+            const userInfo = document.getElementById('user-info');
+            const usernameDisplay = document.getElementById('username-display');
+            const logoutBtn = document.getElementById('logout-btn');
+            const loginTab = document.getElementById('login-tab');
+            const registerTab = document.getElementById('register-tab');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const loginUsername = document.getElementById('login-username');
+            const loginPassword = document.getElementById('login-password');
+            const registerUsername = document.getElementById('register-username');
+            const registerPassword = document.getElementById('register-password');
+            const registerConfirmPassword = document.getElementById('register-confirm-password');
+            const registerFullname = document.getElementById('register-fullname');
+            
+            const machineButtons = document.querySelectorAll('.machine-btn');
+            const selectedMachineElement = document.getElementById('selected-machine');
+            const startButton = document.getElementById('start-btn');
+            const stopButton = document.getElementById('stop-btn');
+            const timerElement = document.getElementById('timer');
+            const sessionStartTimeElement = document.getElementById('session-start-time');
+            const shiftStartTimeElement = document.getElementById('shift-start-time');
+            const sessionsCountElement = document.getElementById('sessions-count');
+            const generateReportButton = document.getElementById('generate-report');
+            const reportOutputElement = document.getElementById('report-output');
+            const sessionsContainer = document.getElementById('sessions-container');
+            const totalMachinesElement = document.getElementById('total-machines');
+            const objectivesAchievedElement = document.getElementById('objectives-achieved');
+            const avgTimeElement = document.getElementById('avg-time');
+            
+            // Modal elements
+            const stopModal = document.getElementById('stop-modal');
+            const stopNotes = document.getElementById('stop-notes');
+            const stopObjective = document.getElementById('stop-objective');
+            const stopCancel = document.getElementById('stop-cancel');
+            const stopConfirm = document.getElementById('stop-confirm');
+            
+            const editModal = document.getElementById('edit-modal');
+            const editMachine = document.getElementById('edit-machine');
+            const editStart = document.getElementById('edit-start');
+            const editEnd = document.getElementById('edit-end');
+            const editNotes = document.getElementById('edit-notes');
+            const editObjective = document.getElementById('edit-objective');
+            const editCancel = document.getElementById('edit-cancel');
+            const editConfirm = document.getElementById('edit-confirm');
+            
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+            
+            // State variables
+            let selectedMachine = null;
+            let startTime = null;
+            let timerInterval = null;
+            let elapsedTime = 0;
+            let sessions = [];
+            let shiftStartTime = null;
+            let currentUser = null;
+            let currentEditIndex = null;
+            
+            // Check if user is logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                usernameDisplay.textContent = currentUser.fullname || currentUser.username;
+                authContainer.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+                
+                // Load user's data from localStorage
+                loadUserData();
+            }
+            
+            // Auth tab switching
+            loginTab.addEventListener('click', function() {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            });
+            
+            registerTab.addEventListener('click', function() {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+            
+            // Login functionality
+            loginBtn.addEventListener('click', function() {
+                const username = loginUsername.value;
+                const password = loginPassword.value;
+                
+                if (!username || !password) {
+                    alert('Please enter both username and password');
+                    return;
+                }
+                
+                // Simulate login - in a real app, this would call your server
+                simulateLogin(username, password);
+            });
+            
+            // Register functionality
+            registerBtn.addEventListener('click', function() {
+                const username = registerUsername.value;
+                const password = registerPassword.value;
+                const confirmPassword = registerConfirmPassword.value;
+                const fullname = registerFullname.value;
+                
+                if (!username || !password || !confirmPassword || !fullname) {
+                    alert('Please fill all fields');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                // Simulate registration - in a real app, this would call your server
+                simulateRegistration(username, password, fullname);
+            });
+            
+            // Logout functionality
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem(`userData_${currentUser.id}`);
+                currentUser = null;
+                authContainer.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+                userInfo.classList.add('hidden');
+                
+                // Clear form fields
+                loginUsername.value = '';
+                loginPassword.value = '';
+                registerUsername.value = '';
+                registerPassword.value = '';
+                registerConfirmPassword.value = '';
+                registerFullname.value = '';
+            });
+            
+            // Initialize machine selection
+            machineButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    machineButtons.forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedMachine = this.getAttribute('data-machine');
+                    selectedMachineElement.textContent = selectedMachine;
+                });
+            });
+            
+            // Start timer
+            startButton.addEventListener('click', function() {
+                if (!selectedMachine) {
+                    alert('Please select a machine first');
+                    return;
+                }
+                
+                // Record start time
+                startTime = new Date();
+                if (!shiftStartTime) {
+                    shiftStartTime = startTime;
+                    shiftStartTimeElement.textContent = formatTime(shiftStartTime);
+                    saveUserData(); // Save the shift start time
+                }
+                
+                // Update UI
+                sessionStartTimeElement.textContent = formatTime(startTime);
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 1000);
+            });
+            
+            // Stop timer - show confirmation modal
+            stopButton.addEventListener('click', function() {
+                if (!startTime) return;
+                
+                // Show the stop confirmation modal
+                stopNotes.value = '';
+                stopObjective.checked = false;
+                stopModal.style.display = 'flex';
+            });
+            
+            // Stop confirmation modal handlers
+            stopCancel.addEventListener('click', function() {
+                stopModal.style.display = 'none';
+            });
+            
+            stopConfirm.addEventListener('click', function() {
+                // Record end time
+                const endTime = new Date();
+                const duration = Math.floor((endTime - startTime) / 1000);
+                const objectiveAchieved = stopObjective.checked;
+                const notes = stopNotes.value;
+                
+                // Save session
+                const session = {
+                    machine: selectedMachine,
+                    startTime: startTime,
+                    endTime: endTime,
+                    duration: duration,
+                    objectiveAchieved: objectiveAchieved,
+                    notes: notes
+                };
+                
+                sessions.push(session);
+                
+                // Save to localStorage
+                saveUserData();
+                
+                // Update UI
+                sessionsCountElement.textContent = sessions.length;
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                
+                // Update dynamic stats
+                updateDynamicStats();
+                
+                // Add to session list
+                addSessionToHistory(session, sessions.length - 1);
+                
+                // Stop timer
+                clearInterval(timerInterval);
+                timerElement.textContent = '00:00:00';
+                elapsedTime = 0;
+                
+                // Hide modal
+                stopModal.style.display = 'none';
+            });
+            
+            // Edit session functionality
+            function setupEditSessionHandler() {
+                document.querySelectorAll('.edit-session').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        const session = sessions[index];
+                        
+                        // Populate edit form
+                        editMachine.value = session.machine;
+                        editStart.value = formatDateTimeLocal(session.startTime);
+                        editEnd.value = formatDateTimeLocal(session.endTime);
+                        editNotes.value = session.notes || '';
+                        editObjective.checked = session.objectiveAchieved || false;
+                        
+                        // Store current edit index
+                        currentEditIndex = index;
+                        
+                        // Show edit modal
+                        editModal.style.display = 'flex';
+                    });
+                });
+            }
+            
+            // Delete session functionality
+            function setupDeleteSessionHandler() {
+                document.querySelectorAll('.delete-session').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        
+                        if (confirm('Are you sure you want to delete this session?')) {
+                            sessions.splice(index, 1);
+                            sessionsCountElement.textContent = sessions.length;
+                            updateDynamicStats();
+                            refreshSessionList();
+                            
+                            // Save to localStorage
+                            saveUserData();
+                        }
+                    });
+                });
+            }
+            
+            // Edit confirmation modal handlers
+            editCancel.addEventListener('click', function() {
+                editModal.style.display = 'none';
+            });
+            
+            editConfirm.addEventListener('click', function() {
+                if (currentEditIndex !== null) {
+                    const session = sessions[currentEditIndex];
+                    
+                    // Update session with edited values
+                    session.machine = editMachine.value;
+                    session.startTime = new Date(editStart.value);
+                    session.endTime = new Date(editEnd.value);
+                    session.duration = Math.floor((session.endTime - session.startTime) / 1000);
+                    session.notes = editNotes.value;
+                    session.objectiveAchieved = editObjective.checked;
+                    
+                    // Update UI
+                    updateDynamicStats();
+                    refreshSessionList();
+                    
+                    // Save to localStorage
+                    saveUserData();
+                    
+                    // Hide modal
+                    editModal.style.display = 'none';
+                }
+            });
+            
+            // Close modal when clicking on X
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    stopModal.style.display = 'none';
+                    editModal.style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === stopModal) {
+                    stopModal.style.display = 'none';
+                }
+                if (event.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            });
+            
+            // Generate report
+            generateReportButton.addEventListener('click', function() {
+                if (sessions.length === 0) {
+                    reportOutputElement.textContent = 'No sessions recorded yet.';
+                    return;
+                }
+                
+                // Calculate statistics
+                const machineStats = {};
+                let totalTime = 0;
+                let totalObjectiveAchieved = 0;
+                
+                sessions.forEach(session => {
+                    // Machine-specific stats
+                    if (!machineStats[session.machine]) {
+                        machineStats[session.machine] = {
+                            totalTime: 0,
+                            sessions: 0,
+                            objectives: 0
+                        };
+                    }
+                    
+                    machineStats[session.machine].totalTime += session.duration;
+                    machineStats[session.machine].sessions += 1;
+                    if (session.objectiveAchieved) {
+                        machineStats[session.machine].objectives += 1;
+                        totalObjectiveAchieved++;
+                    }
+                    
+                    totalTime += session.duration;
+                });
+                
+                // Calculate idle time (time between sessions)
+                let idleTime = 0;
+                for (let i = 1; i < sessions.length; i++) {
+                    const previousEnd = sessions[i-1].endTime.getTime();
+                    const currentStart = sessions[i].startTime.getTime();
+                    idleTime += (currentStart - previousEnd) / 1000;
+                }
+                
+                const averageIdleTime = idleTime / (sessions.length - 1) || 0;
+                
+                // Generate report text
+                let reportText = `SHIFT REPORT\n`;
+                reportText += `Generated: ${formatTime(new Date())}\n`;
+                reportText += `Shift Start: ${formatTime(shiftStartTime)}\n`;
+                reportText += `Total Sessions: ${sessions.length}\n`;
+                reportText += `Total Time: ${formatDuration(totalTime)}\n`;
+                reportText += `Objectives Achieved: ${totalObjectiveAchieved}/${sessions.length}\n`;
+                reportText += `Average Idle Time: ${formatDuration(averageIdleTime)}\n\n`;
+                
+                reportText += `MACHINE BREAKDOWN:\n`;
+                reportText += `----------------\n`;
+                
+                for (const machine in machineStats) {
+                    const stats = machineStats[machine];
+                    const avgTime = stats.totalTime / stats.sessions;
+                    
+                    reportText += `${machine}:\n`;
+                    reportText += `  Sessions: ${stats.sessions}\n`;
+                    reportText += `  Total Time: ${formatDuration(stats.totalTime)}\n`;
+                    reportText += `  Average Time: ${formatDuration(avgTime)}\n`;
+                    reportText += `  Objectives: ${stats.objectives}/${stats.sessions}\n\n`;
+                }
+                
+                reportText += `SESSION DETAILS:\n`;
+                reportText += `----------------\n`;
+                
+                sessions.forEach((session, index) => {
+                    reportText += `${index + 1}. ${session.machine}\n`;
+                    reportText += `    Start: ${formatTime(session.startTime)}\n`;
+                    reportText += `    End: ${formatTime(session.endTime)}\n`;
+                    reportText += `    Duration: ${formatDuration(session.duration)}\n`;
+                    reportText += `    Objective: ${session.objectiveAchieved ? 'Achieved' : 'Not Achieved'}\n`;
+                    reportText += `    Notes: ${session.notes || 'N/A'}\n\n`;
+                });
+
+                
+                reportOutputElement.textContent = reportText;
+            });
+            
+            // Helper functions
+            function updateTimer() {
+                elapsedTime++;
+                timerElement.textContent = formatDuration(elapsedTime);
+            }
+            
+            function formatDuration(seconds) {
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                return [
+                    hrs.toString().padStart(2, '0'),
+                    mins.toString().padStart(2, '0'),
+                    secs.toString().padStart(2, '0')
+                ].join(':');
+            }
+            
+            function formatTime(date) {
+                if (!date || !(date instanceof Date) || isNaN(date)) return 'N/A';
+                
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+            
+            function formatDateTimeLocal(date) {
+                if (!date || !(date instanceof Date) || isNaN(date)) return '';
+                
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                const day = d.getDate().toString().padStart(2, '0');
+                const hours = d.getHours().toString().padStart(2, '0');
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+            
+            function updateDynamicStats() {
+                // Update total machines
+                const uniqueMachines = new Set(sessions.map(session => session.machine));
+                totalMachinesElement.textContent = uniqueMachines.size;
+                
+                // Update objectives achieved
+                const objectivesAchieved = sessions.filter(session => session.objectiveAchieved).length;
+                const percentage = sessions.length > 0 ? Math.round((objectivesAchieved / sessions.length) * 100) : 0;
+                objectivesAchievedElement.textContent = `${percentage}%`;
+                
+                // Update average time
+                const totalTime = sessions.reduce((sum, session) => sum + session.duration, 0);
+                const avgTime = sessions.length > 0 ? Math.round(totalTime / sessions.length) : 0;
+                avgTimeElement.textContent = formatDuration(avgTime);
+            }
+            
+            function addSessionToHistory(session, index) {
+                // Remove the "no sessions" message if it exists
+                const noSessions = document.querySelector('.no-sessions');
+                if (noSessions) {
+                    noSessions.remove();
+                }
+                
+                const sessionItem = document.createElement('div');
+                sessionItem.classList.add('session-item');
+                if (session.objectiveAchieved) {
+                    sessionItem.classList.add('completed');
+                }
+                
+                sessionItem.innerHTML = `
+                    <div class="session-actions">
+                        <button class="session-action-btn edit edit-session" data-index="${index}">Edit</button>
+                        <button class="session-action-btn delete delete-session" data-index="${index}">Delete</button>
+                    </div>
+                    <p><strong>${session.machine}</strong> - ${formatDuration(session.duration)}</p>
+                    <p>${formatTime(session.startTime)} - ${formatTime(session.endTime)}</p>
+                    <p>Objective: ${session.objectiveAchieved ? 'Achieved' : 'Not Achieved'}</p>
+                    ${session.notes ? `<p>Notes: ${session.notes}</p>` : ''}
+                `;
+                
+                sessionsContainer.prepend(sessionItem);
+                
+                // Set up event handlers for the new buttons
+                setupEditSessionHandler();
+                setupDeleteSessionHandler();
+            }
+            
+            function refreshSessionList() {
+                // Clear session list
+                sessionsContainer.innerHTML = '';
+                
+                if (sessions.length === 0) {
+                    sessionsContainer.innerHTML = '<p class="no-sessions">No sessions recorded yet. Start a timer to begin tracking.</p>';
+                } else {
+                    // Add all sessions to history
+                    sessions.forEach((session, index) => {
+                        addSessionToHistory(session, index);
+                    });
+                }
+            }
+            
+            // Save user data to localStorage
+            function saveUserData() {
+                if (!currentUser) return;
+                
+                const userData = {
+                    sessions: sessions.map(session => ({
+                        ...session,
+                        startTime: session.startTime.toISOString(),
+                        endTime: session.endTime.toISOString()
+                    })),
+                    shiftStartTime: shiftStartTime ? shiftStartTime.toISOString() : null
+                };
+                
+                localStorage.setItem(`userData_${currentUser.id}`, JSON.stringify(userData));
+            }
+            
+            // Load user data from localStorage
+            function loadUserData() {
+                if (!currentUser) return;
+                
+                const savedData = localStorage.getItem(`userData_${currentUser.id}`);
+                if (savedData) {
+                    const userData = JSON.parse(savedData);
+                    
+                    // Convert string dates back to Date objects
+                    sessions = (userData.sessions || []).map(session => ({
+                        ...session,
+                        startTime: new Date(session.startTime),
+                        endTime: new Date(session.endTime)
+                    }));
+                    
+                    shiftStartTime = userData.shiftStartTime ? new Date(userData.shiftStartTime) : null;
+                    
+                    // Update UI with loaded data
+                    sessionsCountElement.textContent = sessions.length;
+                    
+                    if (shiftStartTime) {
+                        shiftStartTimeElement.textContent = formatTime(shiftStartTime);
+                    }
+                    
+                    updateDynamicStats();
+                    refreshSessionList();
+                }
+            }
+            
+            // Simulate login (replace with actual API call)
+            function simulateLogin(username, password) {
+                // In a real app, this would be an API call to your server
+                setTimeout(() => {
+                    // Mock successful login
+                    currentUser = {
+                        id: 1,
+                        username: username,
+                        fullname: 'Maintenance Technician'
+                    };
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    usernameDisplay.textContent = currentUser.fullname || currentUser.username;
+                    authContainer.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    userInfo.classList.remove('hidden');
+                    
+                    // Load user's data from localStorage
+                    loadUserData();
+                }, 500);
+            }
+            
+            // Simulate registration (replace with actual API call)
+            function simulateRegistration(username, password, fullname) {
+                // In a real app, this would be an API call to your server
+                setTimeout(() => {
+                    alert('Registration successful! You can now login.');
+                    loginTab.click();
+                    registerUsername.value = '';
+                    registerPassword.value = '';
+                    registerConfirmPassword.value = '';
+                    registerFullname.value = '';
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
